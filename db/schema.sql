@@ -37,6 +37,11 @@ CREATE TABLE facts (
     UNIQUE (cik, metric_key, period_end, period_start)
 );
 
+-- Speeds up "top companies by metric for a period" (api/queries.py
+-- get_top_for_metric): metric_key + period_end aren't the leading columns
+-- of any other index. See NUMBERS.md Phase 4 for before/after timings.
+CREATE INDEX idx_facts_metric_period ON facts (metric_key, period_end);
+
 CREATE TABLE unmapped_tag_log (
     id           SERIAL PRIMARY KEY,
     cik          INTEGER NOT NULL REFERENCES companies(cik),
