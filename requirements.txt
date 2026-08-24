@@ -1,5 +1,6 @@
 psycopg[binary]==3.3.4
 psycopg_pool==3.3.1
+redis==8.1.0
 python-dotenv==1.0.1
 requests==2.32.3
 fastapi==0.141.1

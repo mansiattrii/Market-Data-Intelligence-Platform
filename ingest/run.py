@@ -1,5 +1,6 @@
 import argparse
 
+from api import cache
 from db import get_connection
 from ingest.companies import TICKERS
 from ingest.fetch import get_ticker_info, get_company_facts
@@ -57,6 +58,7 @@ def main():
         print(f"[ok] {ticker} ({name}): {len(facts)} facts, {len(unmapped)} unmapped tag observations")
 
     conn.close()
+    cache.flush()
 
     print()
     print(f"Companies processed: {len(tickers) - len(skipped)}/{len(tickers)}")

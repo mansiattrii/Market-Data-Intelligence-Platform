@@ -1,7 +1,7 @@
 # Business logic and validation. Deliberately raises plain Python
 # exceptions, not HTTPException -- this file has no idea it's being called
 # from a web request, which is what keeps it decoupled from api/routes.py.
-from api import queries
+from api import cache, queries
 
 
 class NotFoundError(Exception):
@@ -35,7 +35,12 @@ def get_metric_series(conn, ticker, metric, start, end):
     if start is not None and end is not None and start > end:
         raise ValidationError("start date must not be after end date")
 
-    points = queries.get_metric_time_series(conn, company["cik"], metric, start, end)
+    cache_key = cache.key("metric_series", company["cik"], metric, start, end)
+    points = cache.get(cache_key)
+    if points is None:
+        points = queries.get_metric_time_series(conn, company["cik"], metric, start, end)
+        cache.set(cache_key, points)
+
     return {
         "ticker": company["ticker"],
         "metric": metric,
@@ -49,7 +54,12 @@ def get_top_metric(conn, metric, period_end, limit):
     if unit is None:
         raise NotFoundError(f"Unknown metric '{metric}'")
 
-    results = queries.get_top_for_metric(conn, metric, period_end, limit)
+    cache_key = cache.key("top_metric", metric, period_end, limit)
+    results = cache.get(cache_key)
+    if results is None:
+        results = queries.get_top_for_metric(conn, metric, period_end, limit)
+        cache.set(cache_key, results)
+
     return {
         "metric": metric,
         "period_end": period_end,
