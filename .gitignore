@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+
+# Raw SEC API responses cached to disk (Phase 2) -- regenerable, and
+# large enough at ~100 companies that it doesn't belong in git history.
+data/raw/
+*.md
